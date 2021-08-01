@@ -10,8 +10,11 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import br.com.projetotecnico.models.Role;
+import br.com.projetotecnico.models.Telefone;
 import br.com.projetotecnico.models.Usuario;
+import br.com.projetotecnico.models.enums.TipoTelefone;
 import br.com.projetotecnico.repositoty.RoleRepository;
+import br.com.projetotecnico.repositoty.TelefoneRepository;
 import br.com.projetotecnico.repositoty.UsuarioRepository;
 
 @Configuration
@@ -26,7 +29,8 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     @Autowired
     PasswordEncoder passwordEncoder;
     
-    
+    @Autowired
+    TelefoneRepository telefoneRepository;
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
@@ -34,13 +38,14 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     	usuarioRepository.deleteAll();
     	usuarioRepository.deleteAll();
         
-        Role role = criarRoleSeNaoEncontrar("ROLE_USUARIO");
-        
+        Role role = criarRoleSeNaoEncontrar("ROLE_USUARIO");        
         Usuario ezequias = new Usuario(null,"Ezequias","Prado","ezequias@hotmail.com",passwordEncoder.encode("123"),true);
 
         ezequias.setRoles(Arrays.asList(role)); 
         criarUsuarioSeNaoEncontrar(ezequias);
         
+        Telefone telefone = new Telefone(null, "Telefone pessoal", TipoTelefone.CELULAR, "48998415269");
+        telefoneRepository.save(telefone);
         
     }
 

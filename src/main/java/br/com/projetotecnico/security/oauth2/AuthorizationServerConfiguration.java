@@ -45,7 +45,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
                 .authorizedGrantTypes("password", "authorization_code", "refresh_token")
                 .scopes("bar", "read", "write")
                 .resourceIds(this.RESOURCE_ID)
-                .accessTokenValiditySeconds(500)
+                .accessTokenValiditySeconds(10080)
                 .refreshTokenValiditySeconds(60*60*24);
     }
 

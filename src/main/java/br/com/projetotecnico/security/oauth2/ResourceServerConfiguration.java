@@ -25,6 +25,8 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
                 .clearAuthentication(true)
                 .and().authorizeRequests()
                 .antMatchers("/usuarios/{id}/roles").hasAnyRole("USUARIO")
+                .antMatchers("/telefones").hasAnyRole("USUARIO")
+                .antMatchers("/telefones/{id}").hasAnyRole("USUARIO")
                 .anyRequest().denyAll()
                 .and()
                 .exceptionHandling()
