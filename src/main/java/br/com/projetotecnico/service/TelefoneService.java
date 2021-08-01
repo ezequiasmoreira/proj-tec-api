@@ -1,5 +1,8 @@
 package br.com.projetotecnico.service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,5 +44,26 @@ public class TelefoneService {
 		Optional<Telefone> telefone = telefoneRepository.findById(telefoneId);
 		return telefone.orElseThrow(() -> new ObjectNotFoundException("Telefone não encontrado."));
 	}
+	
+	public List<Telefone> salvarTelefones(List<Telefone> telefones) {
+		List<Telefone> listaDeTelefones = new ArrayList<>();
+		for (Telefone telefone : telefones) {
+			listaDeTelefones.add(telefoneRepository.save(telefone));
+		}
+		return listaDeTelefones;
+	}
+	
+	public List<Telefone> atualizarTelefones(List<Telefone> telefones) {
+		List<Telefone> listaDeTelefones = new ArrayList<>();		
+		for (Telefone telefone : telefones) {
+			if (telefone.getId() == null) {
+				listaDeTelefones.add(salvar(telefone));
+			}else {
+				listaDeTelefones.add(atualizar(telefone));
+			}
+		}
+		return listaDeTelefones;
+	}
+	
 
 }

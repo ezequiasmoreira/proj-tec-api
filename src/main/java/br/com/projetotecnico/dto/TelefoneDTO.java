@@ -1,6 +1,8 @@
 package br.com.projetotecnico.dto;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import br.com.projetotecnico.models.Telefone;
 import br.com.projetotecnico.models.Usuario;
@@ -10,7 +12,9 @@ public class TelefoneDTO implements Serializable {
     private String descricao;
     private Integer tipo;
     private String numero;
-    
+    private Integer clienteId;	
+    private List<Telefone> telefones = new ArrayList<>();
+   
     public TelefoneDTO() {}
 
     public TelefoneDTO(Telefone telefone) {
@@ -51,5 +55,21 @@ public class TelefoneDTO implements Serializable {
 
 	public void setNumero(String numero) {
 		this.numero = numero;
+	}
+
+	public Integer getClienteId() {
+		return clienteId;
+	}
+
+	public void setClienteId(Integer clienteId) {
+		this.clienteId = clienteId;
+	}
+	 
+    public List<Telefone> getTelefones() {
+		return telefones;
+	}
+
+	public void setTelefones(List<Telefone> telefones) {
+		this.telefones = telefones;
 	}
 }

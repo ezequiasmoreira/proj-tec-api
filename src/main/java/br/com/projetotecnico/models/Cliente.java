@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -29,11 +30,7 @@ public class Cliente implements Serializable {
     private String sobrenome;
     private String cpfCnpj;
     
-    @OneToOne
-	@JoinColumn(name="telefone_id")
-    private Telefone telefonePrincipal;
-
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER,cascade=CascadeType.ALL)
 	@JoinTable(name = "CLIENTE_TELEFONE",
 		joinColumns = @JoinColumn(name = "cliente_id"),
 		inverseJoinColumns = @JoinColumn(name = "telefone_id")
@@ -47,16 +44,14 @@ public class Cliente implements Serializable {
         this.nome = clienteDTO.getNome();
         this.sobrenome = clienteDTO.getSobrenome();
         this.cpfCnpj = clienteDTO.getCpfCnpj();
-        this.telefonePrincipal = clienteDTO.getTelefonePrincipal();
     }
     
-	public Cliente(Integer id, String nome, String sobrenome, String cpfCnpj, Telefone telefonePrincipal) {
+	public Cliente(Integer id, String nome, String sobrenome, String cpfCnpj) {
 		super();
 		this.id = id;
 		this.nome = nome;
 		this.sobrenome = sobrenome;
 		this.cpfCnpj = cpfCnpj;
-		this.telefonePrincipal = telefonePrincipal;
 	}
 
 	public Integer getId() {
@@ -89,14 +84,6 @@ public class Cliente implements Serializable {
 
 	public void setCpfCnpj(String cpfCnpj) {
 		this.cpfCnpj = cpfCnpj;
-	}
-
-	public Telefone getTelefonePrincipal() {
-		return telefonePrincipal;
-	}
-
-	public void setTelefonePrincipal(Telefone telefonePrincipal) {
-		this.telefonePrincipal = telefonePrincipal;
 	}
 
 	public List<Telefone> getTelefones() {

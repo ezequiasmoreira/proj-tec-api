@@ -13,7 +13,6 @@ public class ClienteDTO implements Serializable {
     private String nome;
     private String sobrenome;
     private String cpfCnpj;
-    private Telefone telefonePrincipal;
     private List<Telefone> telefones = new ArrayList<>();
     
     public ClienteDTO() {}
@@ -24,7 +23,6 @@ public class ClienteDTO implements Serializable {
 		this.nome = cliente.getNome();
 		this.sobrenome = cliente.getSobrenome();
 		this.cpfCnpj = cliente.getCpfCnpj();
-		this.telefonePrincipal = cliente.getTelefonePrincipal();
 		this.telefones = cliente.getTelefones();
 	}
 
@@ -59,15 +57,7 @@ public class ClienteDTO implements Serializable {
 	public void setCpfCnpj(String cpfCnpj) {
 		this.cpfCnpj = cpfCnpj;
 	}
-
-	public Telefone getTelefonePrincipal() {
-		return telefonePrincipal;
-	}
-
-	public void setTelefonePrincipal(Telefone telefonePrincipal) {
-		this.telefonePrincipal = telefonePrincipal;
-	}
-
+	
 	public List<Telefone> getTelefones() {
 		return telefones;
 	}

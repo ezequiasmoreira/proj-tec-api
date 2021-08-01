@@ -54,9 +54,9 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         Telefone telefone2 = new Telefone(null, "Telefone comercial", TipoTelefone.COMERCIAL, "48998418796");
         telefoneRepository.save(telefone);
         telefoneRepository.save(telefone1);
-        telefoneRepository.save(telefone2);      
+        telefoneRepository.save(telefone2); 
         
-        Cliente cliente = new Cliente(null, "joão", "silva", "10801593688", telefone1);
+        Cliente cliente = new Cliente(null, "joão", "silva", "10801593688");
         clienteRepository.save(cliente);
     }
 
