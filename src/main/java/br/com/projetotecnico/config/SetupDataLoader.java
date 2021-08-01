@@ -9,10 +9,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import br.com.projetotecnico.models.Cliente;
 import br.com.projetotecnico.models.Role;
 import br.com.projetotecnico.models.Telefone;
 import br.com.projetotecnico.models.Usuario;
 import br.com.projetotecnico.models.enums.TipoTelefone;
+import br.com.projetotecnico.repositoty.ClienteRepository;
 import br.com.projetotecnico.repositoty.RoleRepository;
 import br.com.projetotecnico.repositoty.TelefoneRepository;
 import br.com.projetotecnico.repositoty.UsuarioRepository;
@@ -31,6 +33,9 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     
     @Autowired
     TelefoneRepository telefoneRepository;
+    
+    @Autowired
+    ClienteRepository clienteRepository;
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
@@ -45,8 +50,14 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         criarUsuarioSeNaoEncontrar(ezequias);
         
         Telefone telefone = new Telefone(null, "Telefone pessoal", TipoTelefone.CELULAR, "48998415269");
+        Telefone telefone1 = new Telefone(null, "Telefone residencial", TipoTelefone.RESIDENCIAL, "48998418050");
+        Telefone telefone2 = new Telefone(null, "Telefone comercial", TipoTelefone.COMERCIAL, "48998418796");
         telefoneRepository.save(telefone);
+        telefoneRepository.save(telefone1);
+        telefoneRepository.save(telefone2);      
         
+        Cliente cliente = new Cliente(null, "joão", "silva", "10801593688", telefone1);
+        clienteRepository.save(cliente);
     }
 
     private Usuario criarUsuarioSeNaoEncontrar(final Usuario usuario) {

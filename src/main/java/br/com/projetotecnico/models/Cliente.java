@@ -12,6 +12,10 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+
+import br.com.projetotecnico.dto.ClienteDTO;
+import br.com.projetotecnico.dto.UsuarioDTO;
 
 @Entity
 public class Cliente implements Serializable { 
@@ -24,6 +28,9 @@ public class Cliente implements Serializable {
     private String nome;
     private String sobrenome;
     private String cpfCnpj;
+    
+    @OneToOne
+	@JoinColumn(name="telefone_id")
     private Telefone telefonePrincipal;
 
     @OneToMany(fetch = FetchType.EAGER)
@@ -35,15 +42,21 @@ public class Cliente implements Serializable {
 
     public Cliente() { }
 
-	public Cliente(Integer id, String nome, String sobrenome, String cpfCnpj, Telefone telefonePrincipal,
-			List<Telefone> telefones) {
+    public Cliente(ClienteDTO clienteDTO) {
+    	this.id = clienteDTO.getId();
+        this.nome = clienteDTO.getNome();
+        this.sobrenome = clienteDTO.getSobrenome();
+        this.cpfCnpj = clienteDTO.getCpfCnpj();
+        this.telefonePrincipal = clienteDTO.getTelefonePrincipal();
+    }
+    
+	public Cliente(Integer id, String nome, String sobrenome, String cpfCnpj, Telefone telefonePrincipal) {
 		super();
 		this.id = id;
 		this.nome = nome;
 		this.sobrenome = sobrenome;
 		this.cpfCnpj = cpfCnpj;
 		this.telefonePrincipal = telefonePrincipal;
-		this.telefones = telefones;
 	}
 
 	public Integer getId() {
