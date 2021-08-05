@@ -17,6 +17,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import br.com.projetotecnico.dto.ClienteDTO;
 import br.com.projetotecnico.dto.UsuarioDTO;
 
@@ -34,6 +36,7 @@ public class Cliente implements Serializable {
     @Column(unique=true)
     private String cpfCnpj;
     
+    @JsonIgnore
     @OneToOne
 	@JoinColumn(name="endereco_id")
     private Endereco endereco;

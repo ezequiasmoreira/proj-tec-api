@@ -7,16 +7,24 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import br.com.projetotecnico.exception.ObjectNotFoundException;
+import br.com.projetotecnico.models.Cidade;
 import br.com.projetotecnico.models.Cliente;
 import br.com.projetotecnico.models.Endereco;
+import br.com.projetotecnico.models.Estado;
+import br.com.projetotecnico.repositoty.CidadeRepository;
 import br.com.projetotecnico.repositoty.ClienteRepository;
 import br.com.projetotecnico.repositoty.EnderecoRepository;
+import br.com.projetotecnico.repositoty.EstadoRepository;
 
 @Service
 public class EnderecoService {
 
 	@Autowired
 	private EnderecoRepository enderecoRepository;
+	@Autowired
+	private EstadoRepository estadoRepository;
+	@Autowired
+	private CidadeRepository cidadeRepository;
 	@Autowired
 	private ClienteService clienteService;
 
@@ -70,5 +78,16 @@ public class EnderecoService {
 		return listaDeEnderecos;
 	}
 	
+	public List<Estado> obterTodosEstados() {		
+		return estadoRepository.findAll();
+	}
+	
+	public List<Cidade> obterCidadesPorEstado(Integer estadoId) {		
+		return cidadeRepository.obterCidadesPorEstado(estadoId);
+	}
+	
+	public Cidade obterCidadePorId(Integer cidadeId) {		
+		return cidadeRepository.findById(cidadeId).orElseThrow(()-> new ObjectNotFoundException("Cidade não encontrada com ID: " + cidadeId));
+	}
 
 }
