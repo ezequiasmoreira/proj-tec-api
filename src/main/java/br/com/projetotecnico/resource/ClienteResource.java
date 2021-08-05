@@ -35,10 +35,10 @@ public class ClienteResource  {
 	}	
 	
 	@RequestMapping(value="/{id}",method=RequestMethod.PUT)
-    public ResponseEntity<ClienteDTO> update(@PathVariable Integer id, @RequestBody ClienteDTO clienteDTO) {
+    public ResponseEntity<Cliente> update(@PathVariable Integer id, @RequestBody ClienteDTO clienteDTO) {
         Cliente cliente = clienteService.converterParaDTO(clienteDTO);
         cliente.setId(id);
-        return ResponseEntity.ok().body(new ClienteDTO(clienteService.atualizar(cliente,clienteDTO)));
+        return ResponseEntity.ok().body(clienteService.atualizar(cliente,clienteDTO));
     }
 	
 	@RequestMapping(value="/{id}", method=RequestMethod.DELETE)

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -12,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
@@ -28,7 +30,13 @@ public class Cliente implements Serializable {
 	private Integer id;	
     private String nome;
     private String sobrenome;
+    
+    @Column(unique=true)
     private String cpfCnpj;
+    
+    @OneToOne
+	@JoinColumn(name="endereco_id")
+    private Endereco endereco;
     
     @OneToMany(fetch = FetchType.EAGER,cascade=CascadeType.ALL)
 	@JoinTable(name = "CLIENTE_TELEFONE",
@@ -36,6 +44,13 @@ public class Cliente implements Serializable {
 		inverseJoinColumns = @JoinColumn(name = "telefone_id")
 	)
     private List<Telefone> telefones = new ArrayList<>();
+    
+    @OneToMany(cascade=CascadeType.ALL)
+	@JoinTable(name = "CLIENTE_ENDERECO",
+		joinColumns = @JoinColumn(name = "cliente_id"),
+		inverseJoinColumns = @JoinColumn(name = "endereco_id")
+	)
+    private List<Endereco> enderecos = new ArrayList<>();
 
     public Cliente() { }
 
@@ -92,6 +107,22 @@ public class Cliente implements Serializable {
 
 	public void setTelefones(List<Telefone> telefones) {
 		this.telefones = telefones;
+	}
+	
+	public List<Endereco> getEnderecos() {
+		return enderecos;
+	}
+
+	public void setEnderecos(List<Endereco> enderecos) {
+		this.enderecos = enderecos;
+	}
+
+	public Endereco getEndereco() {
+		return endereco;
+	}
+
+	public void setEndereco(Endereco endereco) {
+		this.endereco = endereco;
 	}
 
 	@Override

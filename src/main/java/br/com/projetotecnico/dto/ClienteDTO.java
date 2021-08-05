@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.com.projetotecnico.models.Cliente;
+import br.com.projetotecnico.models.Endereco;
 import br.com.projetotecnico.models.Telefone;
 import br.com.projetotecnico.models.Usuario;
 
@@ -14,6 +15,7 @@ public class ClienteDTO implements Serializable {
     private String sobrenome;
     private String cpfCnpj;
     private List<Telefone> telefones = new ArrayList<>();
+    private List<Endereco> enderecos = new ArrayList<>();
     
     public ClienteDTO() {}
 
@@ -24,6 +26,7 @@ public class ClienteDTO implements Serializable {
 		this.sobrenome = cliente.getSobrenome();
 		this.cpfCnpj = cliente.getCpfCnpj();
 		this.telefones = cliente.getTelefones();
+		this.enderecos = cliente.getEnderecos();
 	}
 
 	public Integer getId() {
@@ -64,5 +67,13 @@ public class ClienteDTO implements Serializable {
 
 	public void setTelefones(List<Telefone> telefones) {
 		this.telefones = telefones;
-	}    
+	}
+
+	public List<Endereco> getEnderecos() {
+		return enderecos;
+	}
+
+	public void setEnderecos(List<Endereco> enderecos) {
+		this.enderecos = enderecos;
+	}  	
 }

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -11,33 +12,45 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import br.com.projetotecnico.dto.ClienteDTO;
 import br.com.projetotecnico.dto.UsuarioDTO;
-import br.com.projetotecnico.models.enums.TipoTelefone;
+
 @Entity
-public class Telefone implements Serializable { 
-
+public class Estado implements Serializable{
 	private static final long serialVersionUID = 1L;
-
+	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private Integer id;	
-    private String descricao;
-    private Integer tipo;
-    private String numero;
-    
-    public Telefone() { }
-    
-	public Telefone(Integer id, String descricao, TipoTelefone tipoTelefone, String numero) {
+	private Integer id;
+	private String nome;
+	private Integer codigo;
+	
+	@JsonIgnore
+	@OneToMany(mappedBy="estado")
+	private List<Cidade> cidades = new ArrayList<>();
+
+	public Estado() {
+	}
+
+	public Estado(Integer id, String nome,Integer codigo) {
 		super();
 		this.id = id;
-		this.descricao = descricao;
-		this.tipo = tipoTelefone.getCod();
-		this.numero = numero;
+		this.nome = nome;
+		this.codigo = codigo;
+	}
+
+	public Integer getCodigo() {
+		return codigo;
+	}
+
+	public void setCodigo(Integer codigo) {
+		this.codigo = codigo;
 	}
 
 	public Integer getId() {
@@ -48,28 +61,20 @@ public class Telefone implements Serializable {
 		this.id = id;
 	}
 
-	public String getDescricao() {
-		return descricao;
+	public String getNome() {
+		return nome;
 	}
 
-	public void setDescricao(String descricao) {
-		this.descricao = descricao;
+	public void setNome(String nome) {
+		this.nome = nome;
 	}
 
-	public Integer getTipo() {
-		return tipo;
+	public List<Cidade> getCidades() {
+		return cidades;
 	}
 
-	public void setTipo(Integer tipo) {
-		this.tipo = tipo;
-	}
-
-	public String getNumero() {
-		return numero;
-	}
-
-	public void setNumero(String numero) {
-		this.numero = numero;
+	public void setCidades(List<Cidade> cidades) {
+		this.cidades = cidades;
 	}
 
 	@Override
@@ -88,7 +93,7 @@ public class Telefone implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Telefone other = (Telefone) obj;
+		Estado other = (Estado) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;
@@ -97,5 +102,6 @@ public class Telefone implements Serializable {
 		return true;
 	}
 	
-    
+	
+
 }
