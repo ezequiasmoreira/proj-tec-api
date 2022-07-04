@@ -1,10 +1,10 @@
 package br.com.projetotecnico.service;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -50,6 +50,12 @@ public class UsuarioService  {
 	
 	public Usuario converterParaDTO(UsuarioDTO usuarioDTO) {		
 		return new Usuario(usuarioDTO);
+	}
+
+	public Usuario getUsuarioLogado() {
+		return (Usuario) SecurityContextHolder.getContext()
+				.getAuthentication()
+				.getPrincipal();
 	}
 
 }
