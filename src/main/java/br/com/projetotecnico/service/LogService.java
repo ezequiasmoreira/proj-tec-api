@@ -3,10 +3,12 @@ package br.com.projetotecnico.service;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import br.com.projetotecnico.dto.LogDTO;
+import br.com.projetotecnico.dto.LogFilterDTO;
 import br.com.projetotecnico.models.Log;
 import br.com.projetotecnico.models.enums.AcaoEntity;
 import br.com.projetotecnico.models.enums.TipoRetorno;
@@ -34,6 +36,8 @@ public class LogService{
         Method[] methods = entity.getClass().getMethods();
         String dadosEntity = getDadosEntity(entity, methods);
         logRepository.save(montarLog(dadosEntity,entity));
+        setIdentificador(null);
+        this.acao = null;
     }
 
     public Log montarLog (String dadosEntity, Object entity) {
@@ -78,6 +82,7 @@ public class LogService{
             if (tipoRetorno.equals(TipoRetorno.OBJET)) {
                 if ((method.invoke(entity) != null ) && (isObjectParaLog(method.invoke(entity).getClass().getName()))){
                     LogDTO dto = new LogDTO();
+                    dto.setClasse(method.invoke(entity).getClass().getName());
                     dto.setId(Integer.parseInt(getValueIdFk(method.invoke(entity))));
                     return new Gson().toJson(dto);
                 }
@@ -91,6 +96,7 @@ public class LogService{
                 for (Object obj : listObject){
                     if(isObjectParaLog(obj.getClass().getName())) {
                         LogDTO logDTOListObject = new LogDTO();
+                        logDTOListObject.setClasse(obj.getClass().getName());
                         logDTOListObject.setId(Integer.parseInt(getValueIdFk(obj)));
                         listDTO.add(logDTOListObject);
                     }
@@ -184,10 +190,76 @@ public class LogService{
         log.setUsuario(usuarioService.getUsuarioLogado());
         log.setEntity(object.getClass().getName());
         logRepository.save(log);
+        this.identificador = null;
     }
 
     public void logDelete(Object object) {
         this.acao = AcaoEntity.DELETE;
         salvar(object);
+        this.acao = null;
+    }
+
+    public List<Log> getFilter(LogFilterDTO logFilter) {
+        List<Log> logs = new ArrayList<>();
+        List<Log> logsFilter = new ArrayList<>();
+        try {
+            List<Integer> acao = new ArrayList<>(Arrays.asList(
+                    AcaoEntity.CRIAR.getCod(),
+                    AcaoEntity.ATUALIZAR.getCod(),
+                    AcaoEntity.DELETE.getCod()));
+
+            acao = !logFilter.getAcao().isEmpty() ?  new ArrayList<>(logFilter.getAcao()) : acao;
+
+            if ((logFilter.getDataInicial() == null) || (logFilter.getDataFinal() == null)) {
+                logs = logFilter.getIdentificador() != null ? logRepository.getFilter(logFilter.getClasse(),
+                        logFilter.getIdentificador().toString(), acao) : logRepository.getFilter(logFilter.getClasse(),acao);
+            } else {
+
+                logs = logFilter.getIdentificador() == null ? logRepository.getFilter(
+                        logFilter.getClasse(),
+                        logFilter.getDataInicial(),
+                        logFilter.getDataFinal(),acao) : logRepository.getFilter(
+                        logFilter.getClasse(),
+                        logFilter.getIdentificador().toString(),
+                        logFilter.getDataInicial(),
+                        logFilter.getDataFinal(),acao);
+
+            }
+            if (logFilter.getCampoValue() == null) {
+                return logs;
+            }
+
+            for (Log log : logs) {
+                Object entity = Class.forName(log.getEntity()).getDeclaredConstructor().newInstance();
+                Object object = new Gson().fromJson(log.getCampos(), entity.getClass());
+                String propriedade = logFilter.getCampoName().substring(0, 1).toUpperCase().concat(logFilter.getCampoName().substring(1));
+                String nomeMetodo = "get" + propriedade;
+                Method method = object.getClass().getDeclaredMethod(nomeMetodo);
+                TipoRetorno tipoRetorno = getTipoRetorno(method);
+                if (tipoRetorno.equals(TipoRetorno.OBJET)) {
+                    if ((method.invoke(object) != null) && getValueIdFk(method.invoke(object)).equals(logFilter.getCampoValue())) {
+                        logsFilter.add(log);
+                    }
+                }
+                if (tipoRetorno.equals(TipoRetorno.LIST_OBJET)) {
+                    List listObject = (List<?>) method.invoke(object);
+                    if(!listObject.isEmpty()) {
+                        for (Object obj : listObject) {
+                            Method methodId = obj.getClass().getDeclaredMethod("getId");
+                            if ((methodId.invoke(obj).toString()).equals(logFilter.getCampoValue())) {
+                                logsFilter.add(log);
+                            }
+                        }
+                    }
+                }
+                if ((method.invoke(object) != null) && (method.invoke(object).toString()).equals(logFilter.getCampoValue())) {
+                    logsFilter.add(log);
+                }
+            }
+            return logsFilter;
+        }catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e){
+            System.out.println(e.getMessage());
+        }
+        return logsFilter;
     }
 }
