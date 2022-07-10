@@ -294,6 +294,18 @@ public class LogService{
                         }
                     }
                 }
+
+                if (tipoRetorno.equals(TipoRetorno.SET_OBJET)) {
+                    Set setObject = (Set<?>) method.invoke(object);
+                    if(!setObject.isEmpty()) {
+                        for (Object obj : setObject) {
+                            Method methodId = obj.getClass().getDeclaredMethod("getId");
+                            if ((methodId.invoke(obj).toString()).equals(logFilter.getCampoValue())) {
+                                logsFilter.add(log);
+                            }
+                        }
+                    }
+                }
                 if ((method.invoke(object) != null) && (method.invoke(object).toString()).equals(logFilter.getCampoValue())) {
                     logsFilter.add(log);
                 }
