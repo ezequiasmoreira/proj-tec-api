@@ -1,11 +1,9 @@
 package br.com.projetotecnico.service;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import br.com.projetotecnico.dto.LogDTO;
 import br.com.projetotecnico.dto.LogFilterDTO;
@@ -59,21 +57,30 @@ public class LogService{
     public String getDadosEntity (Object entity, Method[] methods){
 
         String json = "{";
+        Field[] fieldsDeclared = entity.getClass().getDeclaredFields();
         for (int j = 0, m = methods.length; j < m; j++) {
             Method method = methods[j];
-            if (method.getAnnotatedReturnType().toString() != "void")  {
+            if (method.getAnnotatedReturnType().getType().toString() != "void")  {
                 String valorInicialMetodo = getValorInicialMetodo(method);
                 if (!valorInicialMetodo.isEmpty()) {
                     String atributo = getAtributo(valorInicialMetodo, method);
-                    TipoRetorno tipoRetorno = getTipoRetorno(method);
-                    String escape = (tipoRetorno.equals(TipoRetorno.OBJET)||tipoRetorno.equals(TipoRetorno.LIST_OBJET)) ? "" : "\"";
-                    String campoJson = "\"" + atributo + "\":" + escape + getValorDoAtributo(method, entity) + escape;
-                    json += (json== "{") ? campoJson : "," + campoJson;
+                    if (isFieldDeclarad(atributo, fieldsDeclared)) {
+                        TipoRetorno tipoRetorno = getTipoRetorno(method);
+                        String escape = getEscape(tipoRetorno);
+                        String campoJson = "\"" + atributo + "\":" + escape + getValorDoAtributo(method, entity) + escape;
+                        json += (json == "{") ? campoJson : "," + campoJson;
+                    }
                 }
             }
         }
         json += "}";
         return json;
+    }
+
+    public String getEscape(TipoRetorno tipoRetorno){
+        return (tipoRetorno.equals(TipoRetorno.OBJET) ||
+                tipoRetorno.equals(TipoRetorno.SET_OBJET) ||
+                tipoRetorno.equals(TipoRetorno.LIST_OBJET)) ? "" : "\"";
     }
 
     public String getValorDoAtributo(Method method, Object entity){
@@ -91,23 +98,44 @@ public class LogService{
 
             if (tipoRetorno.equals(TipoRetorno.LIST_OBJET)){
                 List listObject = (List<?>)method.invoke(entity);
+                return new Gson().toJson(getListDTO(listObject));
+            }
 
-                List<LogDTO> listDTO = new ArrayList<>();
-                for (Object obj : listObject){
-                    if(isObjectParaLog(obj.getClass().getName())) {
-                        LogDTO logDTOListObject = new LogDTO();
-                        logDTOListObject.setClasse(obj.getClass().getName());
-                        logDTOListObject.setId(Integer.parseInt(getValueIdFk(obj)));
-                        listDTO.add(logDTOListObject);
-                    }
-                }
-                return new Gson().toJson(listDTO);
+            if (tipoRetorno.equals(TipoRetorno.SET_OBJET)){
+                Set setObject = (Set<?>)method.invoke(entity);
+                return new Gson().toJson(getSetDTO(setObject));
             }
             return method.invoke(entity).toString();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
         return "";
+    }
+
+    public Set<LogDTO> getSetDTO(Set setObject) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        Set<LogDTO> setDTO = new HashSet<>();
+        for (Object obj : setObject){
+            if(isObjectParaLog(obj.getClass().getName())) {
+                LogDTO logDTOSetObject = new LogDTO();
+                logDTOSetObject.setClasse(obj.getClass().getName());
+                logDTOSetObject.setId(Integer.parseInt(getValueIdFk(obj)));
+                setDTO.add(logDTOSetObject);
+            }
+        }
+        return  setDTO;
+    }
+
+    public List<LogDTO> getListDTO(List listObject) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        List<LogDTO> listDTO = new ArrayList<>();
+        for (Object obj : listObject){
+            if(isObjectParaLog(obj.getClass().getName())) {
+                LogDTO logDTOListObject = new LogDTO();
+                logDTOListObject.setClasse(obj.getClass().getName());
+                logDTOListObject.setId(Integer.parseInt(getValueIdFk(obj)));
+                listDTO.add(logDTOListObject);
+            }
+        }
+        return  listDTO;
     }
 
     public String getValueIdFk(Object entity) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
@@ -123,11 +151,18 @@ public class LogService{
     }
 
     public TipoRetorno getTipoRetorno(Method method){
-        String retorno = method.getAnnotatedReturnType().toString();
+        String retorno = method.getAnnotatedReturnType().getType().toString();
 
         if (TipoRetorno.INTEGER.getDescricao().equals(retorno)) return TipoRetorno.INTEGER;
+        if (TipoRetorno.LONG.getDescricao().equals(retorno)) return TipoRetorno.LONG;
         if (TipoRetorno.STRING.getDescricao().equals(retorno)) return TipoRetorno.STRING;
         if (TipoRetorno.LIST.getDescricao().equals(retorno)) return TipoRetorno.LIST;
+        if (TipoRetorno.SET.getDescricao().equals(retorno)) return TipoRetorno.SET;
+        if (TipoRetorno.DATE.getDescricao().equals(retorno)) return TipoRetorno.DATE;
+        if (TipoRetorno.LOCAL_DATE.getDescricao().equals(retorno)) return TipoRetorno.LOCAL_DATE;
+        if (TipoRetorno.LOCAL_TIME.getDescricao().equals(retorno)) return TipoRetorno.LOCAL_TIME;
+        if (TipoRetorno.LOCAL_DATE_TIME.getDescricao().equals(retorno)) return TipoRetorno.LOCAL_DATE_TIME;
+        if (TipoRetorno.BIG_DECIMAL.getDescricao().equals(retorno)) return TipoRetorno.BIG_DECIMAL;
         return getTipoRetornoDinamico(retorno);
     }
 
@@ -135,6 +170,9 @@ public class LogService{
         Boolean isObjectParaLog = isObjectParaLog(getNomeObject(retorno));
         if (isList(retorno) && isObjectParaLog){
             return TipoRetorno.LIST_OBJET;
+        }
+        if (isSet(retorno) && isObjectParaLog){
+            return TipoRetorno.SET_OBJET;
         }
         return TipoRetorno.OBJET;
     }
@@ -157,6 +195,10 @@ public class LogService{
 
     public Boolean isList(String retorno){
         return  retorno.contains(TipoRetorno.LIST.getDescricao());
+    }
+
+    public Boolean isSet(String retorno){
+        return  retorno.contains(TipoRetorno.SET.getDescricao());
     }
 
     public String getValorInicialMetodo(Method method){
@@ -261,5 +303,11 @@ public class LogService{
             System.out.println(e.getMessage());
         }
         return logsFilter;
+    }
+
+    public Boolean isFieldDeclarad(String propriedade,  Field[] fieldsDeclared){
+        return  (Arrays.stream(Arrays.stream(fieldsDeclared).filter(field ->
+                field.getName().equals(propriedade)
+        ).toArray()).count() > 0);
     }
 }

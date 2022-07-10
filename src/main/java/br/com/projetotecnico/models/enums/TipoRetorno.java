@@ -2,11 +2,20 @@ package br.com.projetotecnico.models.enums;
 
 public enum TipoRetorno {
 	INTEGER(1, "java.lang.Integer"),
-	STRING(2, "java.lang.String"),
+	LONG(2,"java.lang.Long"),
+	STRING(3, "java.lang.String"),
 	LIST(4,"java.util.List"),
-	LIST_OBJET(5, "lista de objeto"),
-	OBJET(6, "objeto"),
-	VOID(7, "void");
+	SET(5, "java.util.Set"),
+	DATE(6, "java.util.Date"),
+	LOCAL_DATE(7,"java.time.LocalDate"),
+	LOCAL_DATE_TIME(8,"java.time.LocalDateTime"),
+	LOCAL_TIME(9,"java.time.LocalTime"),
+	BIG_DECIMAL(10,"java.math.BigDecimal"),
+	BOOLEAN(11,"java.lang.Boolean"),
+	LIST_OBJET(12, "lista de objeto"),
+	SET_OBJET(13, "set de objeto"),
+	OBJET(14, "objeto"),
+	VOID(15, "void");
 
 	private int cod;
 	private String descricao;

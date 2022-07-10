@@ -1,8 +1,11 @@
 package br.com.projetotecnico.models;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.*;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -17,6 +20,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import br.com.projetotecnico.models.enums.AcaoEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import br.com.projetotecnico.dto.ClienteDTO;
@@ -55,14 +59,55 @@ public class Cliente implements Serializable {
 	)
     private List<Endereco> enderecos = new ArrayList<>();
 
-    public Cliente() { }
+	@Column(name = "data_cadastro")
+	private Date dataCadastro;
+
+	@Column(name = "valor_estimado")
+	private BigDecimal valorEstimado;
+
+	@Column(name = "codigo")
+	private Long codigo;
+
+	@Column(name = "data_suspensao")
+	private LocalDate dataSuspensao;
+
+	@Column(name = "data_alteracao")
+	private LocalDateTime dataAlteracao;
+
+	@Column(name = "hora_alteracao")
+	private LocalTime horaAlteracao;
+
+	private Boolean status = true;
+
+	@OneToMany(fetch = FetchType.EAGER,cascade=CascadeType.ALL)
+	@JoinTable(name = "CLIENTE_TELEFONE_SET",
+			joinColumns = @JoinColumn(name = "cliente_id"),
+			inverseJoinColumns = @JoinColumn(name = "telefone_id")
+	)
+	private Set<Telefone> contatos = new HashSet<>();
+
+
+	public Cliente() {
+		this.dataCadastro = new Date();
+		this.dataSuspensao = getLocalDate();
+		this.dataAlteracao = LocalDateTime.now();
+		this.horaAlteracao = LocalTime.now();
+		this.valorEstimado = this.valorEstimado == null ? new BigDecimal(getNumeroAleatorio()) :  this.valorEstimado ;
+		this.codigo = this.codigo == null ? Long.valueOf(getNumeroAleatorio()) :  this.codigo ;
+	}
 
     public Cliente(ClienteDTO clienteDTO) {
     	this.id = clienteDTO.getId();
         this.nome = clienteDTO.getNome();
         this.sobrenome = clienteDTO.getSobrenome();
         this.cpfCnpj = clienteDTO.getCpfCnpj();
-    }
+		this.dataCadastro = new Date();
+		this.dataSuspensao = getLocalDate();
+		this.dataAlteracao = LocalDateTime.now();
+		this.horaAlteracao = LocalTime.now();
+		this.valorEstimado = this.valorEstimado == null ? new BigDecimal(getNumeroAleatorio()) :  this.valorEstimado ;
+		this.codigo = this.codigo == null ? Long.valueOf(getNumeroAleatorio()) :  this.codigo ;
+	}
     
 	public Cliente(Integer id, String nome, String sobrenome, String cpfCnpj) {
 		super();
@@ -70,7 +115,14 @@ public class Cliente implements Serializable {
 		this.nome = nome;
 		this.sobrenome = sobrenome;
 		this.cpfCnpj = cpfCnpj;
+		this.dataCadastro = new Date();
+		this.dataSuspensao = getLocalDate();
+		this.horaAlteracao = LocalTime.now();
+		this.dataAlteracao = LocalDateTime.now();
+		this.valorEstimado = this.valorEstimado == null ? new BigDecimal(getNumeroAleatorio()) :  this.valorEstimado ;
 	}
+
+
 
 	public Integer getId() {
 		return id;
@@ -110,6 +162,11 @@ public class Cliente implements Serializable {
 
 	public void setTelefones(List<Telefone> telefones) {
 		this.telefones = telefones;
+		Set<Telefone> ts = new HashSet<>();
+		for (Telefone t: telefones) {
+			ts.add(t);
+		}
+		setContatos(ts);
 	}
 	
 	public List<Endereco> getEnderecos() {
@@ -126,6 +183,81 @@ public class Cliente implements Serializable {
 
 	public void setEndereco(Endereco endereco) {
 		this.endereco = endereco;
+	}
+
+	public Date getDataCadastro() {
+		return dataCadastro;
+	}
+
+	public void setDataCadastro(Date dataCadastro) {
+		this.dataCadastro = dataCadastro;
+	}
+
+	public BigDecimal getValorEstimado() {
+		return valorEstimado;
+	}
+
+	public void setValorEstimado(BigDecimal valorEstimado) {
+		this.valorEstimado = valorEstimado;
+	}
+
+	public Long getCodigo() {
+		return codigo;
+	}
+
+	public void setCodigo(Long codigo) {
+		this.codigo = codigo;
+	}
+
+	public Boolean getStatus() {
+		return status;
+	}
+
+	public void setStatus(Boolean status) {
+		this.status = status;
+	}
+
+	public LocalDate getDataSuspensao() {
+		return dataSuspensao;
+	}
+
+	public void setDataSuspensao(LocalDate dataSuspensao) {
+		this.dataSuspensao = dataSuspensao;
+	}
+
+	public LocalDateTime getDataAlteracao() {
+		return dataAlteracao;
+	}
+
+	public void setDataAlteracao(LocalDateTime dataAlteracao) {
+		this.dataAlteracao = dataAlteracao;
+	}
+
+	public  LocalDate getLocalDate(){
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(new Date());
+		return LocalDate.of(calendar.get(1), calendar.get(2) + 1, calendar.get(5));
+	}
+
+	public Integer getNumeroAleatorio(){
+		Random gerador = new Random();
+		return gerador.nextInt();
+	}
+
+	public LocalTime getHoraAlteracao() {
+		return horaAlteracao;
+	}
+
+	public void setHoraAlteracao(LocalTime horaAlteracao) {
+		this.horaAlteracao = horaAlteracao;
+	}
+
+	public Set<Telefone> getContatos() {
+		return contatos;
+	}
+
+	public void setContatos(Set<Telefone> contatos) {
+		this.contatos = contatos;
 	}
 
 	@Override
