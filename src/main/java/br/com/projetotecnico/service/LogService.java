@@ -109,7 +109,7 @@ public class LogService{
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-        return "";
+        return null;
     }
 
     public Set<LogDTO> getSetDTO(Set setObject) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
@@ -155,14 +155,22 @@ public class LogService{
 
         if (TipoRetorno.INTEGER.getDescricao().equals(retorno)) return TipoRetorno.INTEGER;
         if (TipoRetorno.LONG.getDescricao().equals(retorno)) return TipoRetorno.LONG;
+        if (TipoRetorno.NUMBER.getDescricao().equals(retorno)) return TipoRetorno.NUMBER;
+        if (TipoRetorno.FLOAT.getDescricao().equals(retorno)) return TipoRetorno.FLOAT;
+        if (TipoRetorno.DOUBLE.getDescricao().equals(retorno)) return TipoRetorno.DOUBLE;
+        if (TipoRetorno.SHORT.getDescricao().equals(retorno)) return TipoRetorno.SHORT;
+        if (TipoRetorno.CHARACTER.getDescricao().equals(retorno)) return TipoRetorno.CHARACTER;
         if (TipoRetorno.STRING.getDescricao().equals(retorno)) return TipoRetorno.STRING;
         if (TipoRetorno.LIST.getDescricao().equals(retorno)) return TipoRetorno.LIST;
         if (TipoRetorno.SET.getDescricao().equals(retorno)) return TipoRetorno.SET;
-        if (TipoRetorno.DATE.getDescricao().equals(retorno)) return TipoRetorno.DATE;
-        if (TipoRetorno.LOCAL_DATE.getDescricao().equals(retorno)) return TipoRetorno.LOCAL_DATE;
-        if (TipoRetorno.LOCAL_TIME.getDescricao().equals(retorno)) return TipoRetorno.LOCAL_TIME;
-        if (TipoRetorno.LOCAL_DATE_TIME.getDescricao().equals(retorno)) return TipoRetorno.LOCAL_DATE_TIME;
         if (TipoRetorno.BIG_DECIMAL.getDescricao().equals(retorno)) return TipoRetorno.BIG_DECIMAL;
+        if (TipoRetorno.FLOAT_PRIMITIVO.getDescricao().equals(retorno)) return TipoRetorno.FLOAT_PRIMITIVO;
+        if (TipoRetorno.LONG_PRIMITIVO.getDescricao().equals(retorno)) return TipoRetorno.LONG_PRIMITIVO;
+        if (TipoRetorno.SHORT_PRIMITIVO.getDescricao().equals(retorno)) return TipoRetorno.SHORT_PRIMITIVO;
+        if (TipoRetorno.BYTE_PRIMITIVO.getDescricao().equals(retorno)) return TipoRetorno.BYTE_PRIMITIVO;
+        if (TipoRetorno.INT_PRIMITIVO.getDescricao().equals(retorno)) return TipoRetorno.INT_PRIMITIVO;
+        if (TipoRetorno.CHAR_PRIMITIVO.getDescricao().equals(retorno)) return TipoRetorno.CHAR_PRIMITIVO;
+        if (TipoRetorno.DOUBLE_PRIMITIVO.getDescricao().equals(retorno)) return TipoRetorno.DOUBLE_PRIMITIVO;
         return getTipoRetornoDinamico(retorno);
     }
 
@@ -242,31 +250,13 @@ public class LogService{
     }
 
     public List<Log> getFilter(LogFilterDTO logFilter) {
-        List<Log> logs = new ArrayList<>();
         List<Log> logsFilter = new ArrayList<>();
         try {
-            List<Integer> acao = new ArrayList<>(Arrays.asList(
-                    AcaoEntity.CRIAR.getCod(),
-                    AcaoEntity.ATUALIZAR.getCod(),
-                    AcaoEntity.DELETE.getCod()));
+            List<Integer> acao = getListaAcaoPadrao();
 
             acao = !logFilter.getAcao().isEmpty() ?  new ArrayList<>(logFilter.getAcao()) : acao;
+            List<Log> logs = getLogs(logFilter, acao);
 
-            if ((logFilter.getDataInicial() == null) || (logFilter.getDataFinal() == null)) {
-                logs = logFilter.getIdentificador() != null ? logRepository.getFilter(logFilter.getClasse(),
-                        logFilter.getIdentificador().toString(), acao) : logRepository.getFilter(logFilter.getClasse(),acao);
-            } else {
-
-                logs = logFilter.getIdentificador() == null ? logRepository.getFilter(
-                        logFilter.getClasse(),
-                        logFilter.getDataInicial(),
-                        logFilter.getDataFinal(),acao) : logRepository.getFilter(
-                        logFilter.getClasse(),
-                        logFilter.getIdentificador().toString(),
-                        logFilter.getDataInicial(),
-                        logFilter.getDataFinal(),acao);
-
-            }
             if (logFilter.getCampoValue() == null) {
                 return logs;
             }
@@ -278,34 +268,16 @@ public class LogService{
                 String nomeMetodo = "get" + propriedade;
                 Method method = object.getClass().getDeclaredMethod(nomeMetodo);
                 TipoRetorno tipoRetorno = getTipoRetorno(method);
-                if (tipoRetorno.equals(TipoRetorno.OBJET)) {
-                    if ((method.invoke(object) != null) && getValueIdFk(method.invoke(object)).equals(logFilter.getCampoValue())) {
-                        logsFilter.add(log);
-                    }
-                }
-                if (tipoRetorno.equals(TipoRetorno.LIST_OBJET)) {
-                    List listObject = (List<?>) method.invoke(object);
-                    if(!listObject.isEmpty()) {
-                        for (Object obj : listObject) {
-                            Method methodId = obj.getClass().getDeclaredMethod("getId");
-                            if ((methodId.invoke(obj).toString()).equals(logFilter.getCampoValue())) {
-                                logsFilter.add(log);
-                            }
-                        }
-                    }
-                }
 
-                if (tipoRetorno.equals(TipoRetorno.SET_OBJET)) {
-                    Set setObject = (Set<?>) method.invoke(object);
-                    if(!setObject.isEmpty()) {
-                        for (Object obj : setObject) {
-                            Method methodId = obj.getClass().getDeclaredMethod("getId");
-                            if ((methodId.invoke(obj).toString()).equals(logFilter.getCampoValue())) {
-                                logsFilter.add(log);
-                            }
-                        }
-                    }
-                }
+                tipoRetorno = isDate(method) ? getTipoRetornoDate(method) : tipoRetorno;
+
+                setLogFilterObject(tipoRetorno, method, object, logFilter, log, logsFilter);
+                setLogFilterListObject(tipoRetorno, method, object, logFilter, log, logsFilter);
+                setLogFilterSetObject(tipoRetorno, method, object, logFilter, log, logsFilter);
+
+                setLogFilterDate(method, object, logFilter, log, logsFilter);
+                setLogFilterDateHour(method, object, logFilter, log, logsFilter);
+
                 if ((method.invoke(object) != null) && (method.invoke(object).toString()).equals(logFilter.getCampoValue())) {
                     logsFilter.add(log);
                 }
@@ -321,5 +293,114 @@ public class LogService{
         return  (Arrays.stream(Arrays.stream(fieldsDeclared).filter(field ->
                 field.getName().equals(propriedade)
         ).toArray()).count() > 0);
+    }
+
+    public Boolean isDate(Method method){
+        return  method.getAnnotatedReturnType().getType().toString().contains("Date");
+    }
+
+    public TipoRetorno getTipoRetornoDate(Method method){
+        String tipoRetorno =  method.getAnnotatedReturnType().getType().toString();
+        return  TipoRetorno.LOCAL_DATE.getDescricao().equals(tipoRetorno) ? TipoRetorno.LOCAL_DATE :
+                TipoRetorno.LOCAL_DATE_TIME.getDescricao().equals(tipoRetorno) ? TipoRetorno.LOCAL_DATE_TIME :
+                TipoRetorno.DATE;
+    }
+
+    public Boolean isCampoDateValido(String data){
+        if (data.isEmpty()) return false;
+        if (data.length() != 10) return  false;
+        return data.contains("-");
+    }
+
+    public Boolean isCampoDateHourValido(String data){
+        if (data.isEmpty()) return false;
+        if (data.length() != 19) return  false;
+        return data.contains("-") && data.contains(" ") && data.contains(":");
+    }
+
+    public  List<Integer> getListaAcaoPadrao() {
+        return new ArrayList<>(Arrays.asList(
+                AcaoEntity.CRIAR.getCod(),
+                AcaoEntity.ATUALIZAR.getCod(),
+                AcaoEntity.DELETE.getCod()));
+    }
+
+    public  List<Log> getLogs(LogFilterDTO logFilter, List<Integer> acao) {
+        List<Log> logs = new ArrayList<>();
+        if ((logFilter.getDataInicial() == null) || (logFilter.getDataFinal() == null)) {
+            logs = logFilter.getIdentificador() != null ? logRepository.getFilter(logFilter.getClasse(),
+                    logFilter.getIdentificador().toString(), acao) : logRepository.getFilter(logFilter.getClasse(),acao);
+        } else {
+
+            logs = logFilter.getIdentificador() == null ? logRepository.getFilter(
+                    logFilter.getClasse(),
+                    logFilter.getDataInicial(),
+                    logFilter.getDataFinal(),acao) : logRepository.getFilter(
+                    logFilter.getClasse(),
+                    logFilter.getIdentificador().toString(),
+                    logFilter.getDataInicial(),
+                    logFilter.getDataFinal(),acao);
+
+        }
+        return logs;
+    }
+
+    public void setLogFilterObject(TipoRetorno tipoRetorno, Method method, Object object, LogFilterDTO logFilter,
+                                   Log log,  List<Log> logsFilter) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        if (tipoRetorno.equals(TipoRetorno.OBJET)) {
+            if ((method.invoke(object) != null) && getValueIdFk(method.invoke(object)).equals(logFilter.getCampoValue())) {
+                logsFilter.add(log);
+            }
+        }
+    }
+
+    public void setLogFilterListObject(TipoRetorno tipoRetorno, Method method, Object object, LogFilterDTO logFilter,
+                                       Log log,  List<Log> logsFilter) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        if (tipoRetorno.equals(TipoRetorno.LIST_OBJET)) {
+            List listObject = (List<?>) method.invoke(object);
+            if(!listObject.isEmpty()) {
+                for (Object obj : listObject) {
+                    Method methodId = obj.getClass().getDeclaredMethod("getId");
+                    if ((methodId.invoke(obj).toString()).equals(logFilter.getCampoValue())) {
+                        logsFilter.add(log);
+                    }
+                }
+            }
+        }
+    }
+
+    public void setLogFilterSetObject(TipoRetorno tipoRetorno, Method method, Object object, LogFilterDTO logFilter,
+                                      Log log,  List<Log> logsFilter) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        if (tipoRetorno.equals(TipoRetorno.SET_OBJET)) {
+            Set setObject = (Set<?>) method.invoke(object);
+            if(!setObject.isEmpty()) {
+                for (Object obj : setObject) {
+                    Method methodId = obj.getClass().getDeclaredMethod("getId");
+                    if ((methodId.invoke(obj).toString()).equals(logFilter.getCampoValue())) {
+                        logsFilter.add(log);
+                    }
+                }
+            }
+        }
+    }
+
+    public void setLogFilterDate(Method method, Object object, LogFilterDTO logFilter, Log log,
+                                 List<Log> logsFilter) throws InvocationTargetException, IllegalAccessException {
+        if((isDate(method)) && (isCampoDateValido(logFilter.getCampoValue()))){
+            if ((method.invoke(object).toString()).contains(logFilter.getCampoValue()))  {
+                logsFilter.add(log);
+            }
+        }
+    }
+
+    public void setLogFilterDateHour(Method method, Object object, LogFilterDTO logFilter, Log log,
+                                     List<Log> logsFilter) throws InvocationTargetException, IllegalAccessException {
+        if((isDate(method)) && (isCampoDateHourValido(logFilter.getCampoValue()))){
+            String[] DataHora = logFilter.getCampoValue().split(" ");
+            if (((method.invoke(object).toString()).contains(DataHora[0])) &&
+                    ((method.invoke(object).toString()).contains(DataHora[1]))){
+                logsFilter.add(log);
+            }
+        }
     }
 }

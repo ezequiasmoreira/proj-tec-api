@@ -7,27 +7,14 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 
-import br.com.projetotecnico.models.enums.AcaoEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import br.com.projetotecnico.dto.ClienteDTO;
-import br.com.projetotecnico.dto.UsuarioDTO;
 
 @Entity
-public class Cliente implements Serializable { 
+public class Cliente implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -79,6 +66,49 @@ public class Cliente implements Serializable {
 
 	private Boolean status = true;
 
+	@Column(name = "tipo_boolean")
+	private boolean tipoBoolean;
+
+	@Column(name = "tipo_int")
+	private int tipoInt ;
+
+	@Column(name = "tipo_Double")
+	private Double tipoDouble ;
+
+	@Column(name = "tipo_doube_min")
+	private double tipoDoubeMin ;
+
+	@Column(name = "tipo_short2")
+	private short tipoShort2 ;
+
+	@Column(name = "tipo_byte2")
+	private byte tipoByte2 ;
+
+	@Column(name = "tipo_byte")
+	private Byte tipoByte ;
+
+	@Column(name = "tipo_short")
+	private Short tipoShort ;
+
+	@Column(name = "tipo_char")
+	private char tipoChar;
+
+	@Column(name = "tipo_character")
+	private Character tipoCharacter;
+
+	@Column(name = "tipo_long")
+	private long tipoLong;
+
+	@Column(name = "tipo_float")
+	private Float tipoFloat;
+
+	@Column(name = "tipo_float2")
+	private float tipoFloat2;
+
+	@Column(name = "tipo_number")
+	private Number tipoNumber;
+
+
 	@OneToMany(fetch = FetchType.EAGER,cascade=CascadeType.ALL)
 	@JoinTable(name = "CLIENTE_TELEFONE_SET",
 			joinColumns = @JoinColumn(name = "cliente_id"),
@@ -92,6 +122,9 @@ public class Cliente implements Serializable {
 		this.dataSuspensao = getLocalDate();
 		this.dataAlteracao = LocalDateTime.now();
 		this.horaAlteracao = LocalTime.now();
+		this.tipoByte = 32;
+		this.tipoByte2 = 32;
+		this.tipoChar = 'S';
 		this.valorEstimado = this.valorEstimado == null ? new BigDecimal(getNumeroAleatorio()) :  this.valorEstimado ;
 		this.codigo = this.codigo == null ? Long.valueOf(getNumeroAleatorio()) :  this.codigo ;
 	}
@@ -105,6 +138,9 @@ public class Cliente implements Serializable {
 		this.dataSuspensao = getLocalDate();
 		this.dataAlteracao = LocalDateTime.now();
 		this.horaAlteracao = LocalTime.now();
+		this.tipoByte = 32;
+		this.tipoByte2 = 32;
+		this.tipoChar = 'S';
 		this.valorEstimado = this.valorEstimado == null ? new BigDecimal(getNumeroAleatorio()) :  this.valorEstimado ;
 		this.codigo = this.codigo == null ? Long.valueOf(getNumeroAleatorio()) :  this.codigo ;
 	}
@@ -119,6 +155,10 @@ public class Cliente implements Serializable {
 		this.dataSuspensao = getLocalDate();
 		this.horaAlteracao = LocalTime.now();
 		this.dataAlteracao = LocalDateTime.now();
+		this.tipoByte = 32;
+		this.tipoByte2 = 32;
+		this.tipoChar = 'S';
+		this.tipoBoolean = false;
 		this.valorEstimado = this.valorEstimado == null ? new BigDecimal(getNumeroAleatorio()) :  this.valorEstimado ;
 	}
 
@@ -258,6 +298,118 @@ public class Cliente implements Serializable {
 
 	public void setContatos(Set<Telefone> contatos) {
 		this.contatos = contatos;
+	}
+
+	public boolean isTipoBoolean() {
+		return tipoBoolean;
+	}
+
+	public void setTipoBoolean(boolean tipoBoolean) {
+		this.tipoBoolean = tipoBoolean;
+	}
+
+	public int getTipoInt() {
+		return tipoInt;
+	}
+
+	public void setTipoInt(int tipoInt) {
+		this.tipoInt = tipoInt;
+	}
+
+	public Double getTipoDouble() {
+		return tipoDouble;
+	}
+
+	public void setTipoDouble(Double tipoDouble) {
+		this.tipoDouble = tipoDouble;
+	}
+
+	public double getTipoDoubeMin() {
+		return tipoDoubeMin;
+	}
+
+	public void setTipoDoubeMin(double tipoDoubeMin) {
+		this.tipoDoubeMin = tipoDoubeMin;
+	}
+
+	public short getTipoShort2() {
+		return tipoShort2;
+	}
+
+	public void setTipoShort2(short tipoShort2) {
+		this.tipoShort2 = tipoShort2;
+	}
+
+	public byte getTipoByte2() {
+		return tipoByte2;
+	}
+
+	public void setTipoByte2(byte tipoByte2) {
+		this.tipoByte2 = tipoByte2;
+	}
+
+	public Byte getTipoByte() {
+		return tipoByte;
+	}
+
+	public void setTipoByte(Byte tipoByte) {
+		this.tipoByte = tipoByte;
+	}
+
+	public Short getTipoShort() {
+		return tipoShort;
+	}
+
+	public void setTipoShort(Short tipoShort) {
+		this.tipoShort = tipoShort;
+	}
+
+	public char getTipoChar() {
+		return tipoChar;
+	}
+
+	public void setTipoChar(char tipoChar) {
+		this.tipoChar = tipoChar;
+	}
+
+	public Character getTipoCharacter() {
+		return tipoCharacter;
+	}
+
+	public void setTipoCharacter(Character tipoCharacter) {
+		this.tipoCharacter = tipoCharacter;
+	}
+
+	public long getTipoLong() {
+		return tipoLong;
+	}
+
+	public void setTipoLong(long tipoLong) {
+		this.tipoLong = tipoLong;
+	}
+
+	public Float getTipoFloat() {
+		return tipoFloat;
+	}
+
+	public void setTipoFloat(Float tipoFloat) {
+		this.tipoFloat = tipoFloat;
+	}
+
+	public float getTipoFloat2() {
+		return tipoFloat2;
+	}
+
+	public void setTipoFloat2(float tipoFloat2) {
+		this.tipoFloat2 = tipoFloat2;
+	}
+
+	public Number getTipoNumber() {
+		return tipoNumber;
+	}
+
+	public void setTipoNumber(Number tipoNumber) {
+		this.tipoNumber = tipoNumber;
 	}
 
 	@Override
