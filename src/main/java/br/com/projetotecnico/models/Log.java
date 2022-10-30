@@ -1,7 +1,7 @@
 package br.com.projetotecnico.models;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 import javax.persistence.*;
@@ -25,7 +25,7 @@ public class Log implements Serializable {
 	
 	private Integer acaoEntity;
 	
-	private Date dataCadastro;
+	private LocalDateTime dataCadastro;
 
 	@OneToOne
 	@JoinColumn(name="usuario_id")
@@ -33,7 +33,7 @@ public class Log implements Serializable {
 
 	public Log() {}
 
-	public Log(Integer id, String campos, String entity, String identificador, AcaoEntity acaoEntity, Date dataCadastro,
+	public Log(Integer id, String campos, String entity, String identificador, AcaoEntity acaoEntity, LocalDateTime dataCadastro,
 			Usuario usuario) {
 		super();
 		this.id = id;
@@ -85,11 +85,11 @@ public class Log implements Serializable {
 		this.acaoEntity = acaoEntity.getCod();
 	}
 
-	public Date getDataCadastro() {
+	public LocalDateTime getDataCadastro() {
 		return dataCadastro;
 	}
 
-	public void setDataCadastro(Date dataCadastro) {
+	public void setDataCadastro(LocalDateTime dataCadastro) {
 		this.dataCadastro = dataCadastro;
 	}
 

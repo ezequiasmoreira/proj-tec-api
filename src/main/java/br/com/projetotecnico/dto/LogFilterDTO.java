@@ -1,7 +1,7 @@
 package br.com.projetotecnico.dto;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,9 +10,9 @@ public class LogFilterDTO implements Serializable {
 
 	private String classe;
 
-	private Date dataInicial;
+	private LocalDateTime dataInicial;
 
-	private Date dataFinal;
+	private LocalDateTime dataFinal;
 
 	private String campoName;
 
@@ -38,19 +38,19 @@ public class LogFilterDTO implements Serializable {
 		this.classe = classe;
 	}
 
-	public Date getDataInicial() {
+	public LocalDateTime getDataInicial() {
 		return dataInicial;
 	}
 
-	public void setDataInicial(Date dataInicial) {
+	public void setDataInicial(LocalDateTime dataInicial) {
 		this.dataInicial = dataInicial;
 	}
 
-	public Date getDataFinal() {
+	public LocalDateTime getDataFinal() {
 		return dataFinal;
 	}
 
-	public void setDataFinal(Date dataFinal) {
+	public void setDataFinal(LocalDateTime dataFinal) {
 		this.dataFinal = dataFinal;
 	}
 

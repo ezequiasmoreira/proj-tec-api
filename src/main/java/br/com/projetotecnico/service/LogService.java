@@ -3,6 +3,7 @@ package br.com.projetotecnico.service;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import br.com.projetotecnico.dto.LogDTO;
@@ -49,7 +50,7 @@ public class LogService{
             log.setAcaoEntity(this.acao);
         }
 
-        log.setDataCadastro(new Date());
+        log.setDataCadastro(LocalDateTime.now());
         log.setUsuario(usuarioService.getUsuarioLogado());
         log.setEntity(entity.getClass().getName());
         return  log;
@@ -237,7 +238,7 @@ public class LogService{
         Log log = new Log();
         log.setIdentificador(identificador.toString());
         log.setAcaoEntity(AcaoEntity.DELETE);
-        log.setDataCadastro(new Date());
+        log.setDataCadastro(LocalDateTime.now());
         log.setUsuario(usuarioService.getUsuarioLogado());
         log.setEntity(object.getClass().getName());
         logRepository.save(log);
