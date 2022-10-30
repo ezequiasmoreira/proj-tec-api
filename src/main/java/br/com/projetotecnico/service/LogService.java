@@ -13,10 +13,20 @@ import br.com.projetotecnico.models.enums.AcaoEntity;
 import br.com.projetotecnico.models.enums.TipoRetorno;
 import br.com.projetotecnico.repositoty.LogRepository;
 import com.google.gson.Gson;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ClasspathHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.persistence.Id;
+
 @Service
 public class LogService{
+
+    private Integer ZERO = 0;
+
+    private String PACKAGE = "br.com.projetotecnico";
 
     private Integer identificador;
 
@@ -405,5 +415,26 @@ public class LogService{
                 logsFilter.add(log);
             }
         }
+    }
+
+    public List<Object> getClasses (){
+        Reflections  reflections = new Reflections(
+                PACKAGE,
+                new SubTypesScanner(false),
+                ClasspathHelper.forClassLoader()
+        );
+        Set<Class<?>> classes = reflections.getSubTypesOf(Object.class);
+        List<Object> classesPersistente = new ArrayList<>();
+        classes.forEach(classe -> {
+            try {
+                Field field = classe.getDeclaredField("id");
+                if (field.getAnnotationsByType(Id.class).length > ZERO){
+                    classesPersistente.add(classe);
+                };
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+            }
+        });
+        return classesPersistente;
     }
 }

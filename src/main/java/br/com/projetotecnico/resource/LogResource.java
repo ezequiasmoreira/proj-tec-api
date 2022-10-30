@@ -20,4 +20,9 @@ public class LogResource {
 	public ResponseEntity<List<Log>> getFilter(@RequestBody LogFilterDTO logFilter) {
 		return ResponseEntity.ok().body(logService.getFilter(logFilter));
 	}
+
+	@RequestMapping(value="/classes",method=RequestMethod.GET)
+	public ResponseEntity<List<Object>> getClasses() {
+		return ResponseEntity.ok().body(logService.getClasses());
+	}
 }
