@@ -66,8 +66,9 @@ public class LogService{
                     String atributo = getAtributo(valorInicialMetodo, method);
                     if (isFieldDeclarad(atributo, fieldsDeclared)) {
                         TipoRetorno tipoRetorno = getTipoRetorno(method);
-                        String escape = getEscape(tipoRetorno);
-                        String campoJson = "\"" + atributo + "\":" + escape + getValorDoAtributo(method, entity) + escape;
+                        String valorAtributo = getValorDoAtributo(method, entity);
+                        String escape =  valorAtributo == null ? "" : getEscape(tipoRetorno);
+                        String campoJson = "\"" + atributo + "\":" + escape + valorAtributo + escape;
                         json += (json == "{") ? campoJson : "," + campoJson;
                     }
                 }
@@ -355,7 +356,8 @@ public class LogService{
     }
 
     public void setLogFilterListObject(TipoRetorno tipoRetorno, Method method, Object object, LogFilterDTO logFilter,
-                                       Log log,  List<Log> logsFilter) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+                                       Log log,  List<Log> logsFilter) throws InvocationTargetException, IllegalAccessException,
+                                            NoSuchMethodException {
         if (tipoRetorno.equals(TipoRetorno.LIST_OBJET)) {
             List listObject = (List<?>) method.invoke(object);
             if(!listObject.isEmpty()) {

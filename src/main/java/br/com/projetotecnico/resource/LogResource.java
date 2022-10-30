@@ -16,7 +16,7 @@ public class LogResource {
 	@Autowired
 	LogService logService;
 	
-	@RequestMapping(value="/filter",method=RequestMethod.GET)
+	@RequestMapping(value="/filter",method=RequestMethod.POST)
 	public ResponseEntity<List<Log>> getFilter(@RequestBody LogFilterDTO logFilter) {
 		return ResponseEntity.ok().body(logService.getFilter(logFilter));
 	}
