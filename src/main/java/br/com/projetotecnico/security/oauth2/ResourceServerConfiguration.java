@@ -34,6 +34,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
                 .antMatchers("/enderecos/{ciddaeId}/cidade").hasAnyRole("USUARIO")
                 .antMatchers("/logs/filter").hasAnyRole("USUARIO")
                 .antMatchers("/logs/classes").hasAnyRole("USUARIO")
+                .antMatchers("/logs/propriedades").hasAnyRole("USUARIO")
                 .anyRequest().denyAll()
                 .and()
                 .exceptionHandling()

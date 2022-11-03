@@ -7,7 +7,11 @@ public class LogDTO implements Serializable {
 
 	private String classe;
 
-	private Boolean object = true;
+	private Boolean object = Boolean.TRUE;
+
+	private String tipo;
+
+	private String nome;
 
     public LogDTO() {}
 
@@ -33,5 +37,21 @@ public class LogDTO implements Serializable {
 
 	public void setObject(Boolean object) {
 		this.object = object;
+	}
+
+	public String getTipo() {
+		return tipo;
+	}
+
+	public void setTipo(String tipo) {
+		this.tipo = tipo;
+	}
+
+	public String getNome() {
+		return nome;
+	}
+
+	public void setNome(String nome) {
+		this.nome = nome;
 	}
 }

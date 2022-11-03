@@ -1,6 +1,7 @@
 package br.com.projetotecnico.resource;
 
 
+import br.com.projetotecnico.dto.LogDTO;
 import br.com.projetotecnico.dto.LogFilterDTO;
 import br.com.projetotecnico.models.Log;
 import br.com.projetotecnico.service.LogService;
@@ -24,5 +25,10 @@ public class LogResource {
 	@RequestMapping(value="/classes",method=RequestMethod.GET)
 	public ResponseEntity<List<Object>> getClasses() {
 		return ResponseEntity.ok().body(logService.getClasses());
+	}
+
+	@RequestMapping(value="/propriedades",method=RequestMethod.GET)
+	public ResponseEntity<List<LogDTO>> getPropriedades(@RequestParam(value="classe") String classe) throws ClassNotFoundException {
+		return ResponseEntity.ok().body(logService.getPropriedades(classe));
 	}
 }
