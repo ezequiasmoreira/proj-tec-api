@@ -23,7 +23,7 @@ public class LogResource {
 	}
 
 	@RequestMapping(value="/classes",method=RequestMethod.GET)
-	public ResponseEntity<List<Object>> getClasses() {
+	public ResponseEntity<List<LogDTO>> getClasses() {
 		return ResponseEntity.ok().body(logService.getClasses());
 	}
 

@@ -15,6 +15,11 @@ public class LogDTO implements Serializable {
 
     public LogDTO() {}
 
+	public LogDTO(String classe, String nome) {
+		this.classe = classe;
+		this.nome = nome;
+	}
+
 	public Integer getId() {
 		return id;
 	}

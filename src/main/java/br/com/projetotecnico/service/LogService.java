@@ -417,19 +417,21 @@ public class LogService{
         }
     }
 
-    public List<Object> getClasses (){
+    public List<LogDTO> getClasses (){
         Reflections  reflections = new Reflections(
                 PACKAGE,
                 new SubTypesScanner(false),
                 ClasspathHelper.forClassLoader()
         );
         Set<Class<?>> classes = reflections.getSubTypesOf(Object.class);
-        List<Object> classesPersistente = new ArrayList<>();
+        List<LogDTO> classesPersistente = new ArrayList<>();
         classes.forEach(classe -> {
             try {
                 Field field = classe.getDeclaredField("id");
                 if (field.getAnnotationsByType(Id.class).length > ZERO){
-                    classesPersistente.add(classe);
+                    String nomeCompleto = classe.getName();
+                    String nomeAbreviado = nomeCompleto.substring((nomeCompleto.lastIndexOf(".") + 1), nomeCompleto.length());
+                    classesPersistente.add(new LogDTO(nomeCompleto, nomeAbreviado));
                 };
             } catch (NoSuchFieldException e) {
                 e.printStackTrace();
