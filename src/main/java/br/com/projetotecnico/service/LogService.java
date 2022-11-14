@@ -28,6 +28,8 @@ public class LogService{
 
     private String PACKAGE = "br.com.projetotecnico";
 
+    private String PROPRIEDADES_PARA_IGNORAR = "serialVersionUID";
+
     private Integer identificador;
 
     private AcaoEntity acao;
@@ -446,10 +448,12 @@ public class LogService{
         for (int i = 0, m = fields.length; i < m; i++) {
             LogDTO logDTO = new LogDTO();
             Field field = fields[i];
-            logDTO.setNome(field.getName());
-            logDTO.setTipo(field.getType().getName());
-            logDTO.setObject(isObjectParaLog(field.getType().getName()));
-            listaLogDto.add(logDTO);
+            if (!field.getName().contains(PROPRIEDADES_PARA_IGNORAR)) {
+                logDTO.setNome(field.getName());
+                logDTO.setTipo(field.getType().getName());
+                logDTO.setObject(isObjectParaLog(field.getType().getName()));
+                listaLogDto.add(logDTO);
+            }
         }
         return listaLogDto;
     }
